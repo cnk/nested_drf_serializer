@@ -108,3 +108,60 @@ queryset parameter and that brings us back down to a constant 2 queries.
         serializer_class = MetaGoalSerializer
 
 
+## Oddities ##
+
+Prerequisite table does 7 queries, even when it doesn't display any of
+the queried data:
+
+class MetaGoalPrerequisiteViewSet(viewsets.ModelViewSet):
+    queryset = MetaGoalPrerequisite.objects.all()
+    serializer_class = MetaGoalPrerequisiteSerializer
+
+class MetaGoalPrerequisiteSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = MetaGoalPrerequisite
+        fields = ('id', 'url')
+
+]$ curl http://127.0.0.1:8000/metagoal_prerequisites/ | jq .
+[
+  {
+    "id": 1,
+    "url": "http://127.0.0.1:8000/metagoal_prerequisites/1/"
+  },
+  {
+    "id": 2,
+    "url": "http://127.0.0.1:8000/metagoal_prerequisites/2/"
+  },
+  {
+    "id": 3,
+    "url": "http://127.0.0.1:8000/metagoal_prerequisites/3/"
+  }
+]
+
+(0.000) QUERY = 'SELECT "project_metagoalprerequisite"."id", "project_metagoalprerequisite"."parent_key", "project_metagoalprerequisite"."child_key" FROM "project_metagoalprerequisite"' - PARAMS = (); args=()
+(0.000) QUERY = 'SELECT "project_metagoal"."id", "project_metagoal"."name", "project_metagoal"."project_id" FROM "project_metagoal" WHERE "project_metagoal"."id" = %s' - PARAMS = (2,); args=(2,)
+(0.000) QUERY = 'SELECT "project_metagoal"."id", "project_metagoal"."name", "project_metagoal"."project_id" FROM "project_metagoal" WHERE "project_metagoal"."id" = %s' - PARAMS = (1,); args=(1,)
+(0.000) QUERY = 'SELECT "project_metagoal"."id", "project_metagoal"."name", "project_metagoal"."project_id" FROM "project_metagoal" WHERE "project_metagoal"."id" = %s' - PARAMS = (3,); args=(3,)
+(0.000) QUERY = 'SELECT "project_metagoal"."id", "project_metagoal"."name", "project_metagoal"."project_id" FROM "project_metagoal" WHERE "project_metagoal"."id" = %s' - PARAMS = (2,); args=(2,)
+(0.000) QUERY = 'SELECT "project_metagoal"."id", "project_metagoal"."name", "project_metagoal"."project_id" FROM "project_metagoal" WHERE "project_metagoal"."id" = %s' - PARAMS = (3,); args=(3,)
+(0.000) QUERY = 'SELECT "project_metagoal"."id", "project_metagoal"."name", "project_metagoal"."project_id" FROM "project_metagoal" WHERE "project_metagoal"."id" = %s' - PARAMS = (1,); args=(1,)
+[SQL] 7 queries (3 duplicates), 0 ms SQL time, 58 ms total request time
+[15/Jul/2016 22:16:59] "GET /metagoal_prerequisites/ HTTP/1.1" 200 196
+
+Changing the queryset to `MetaGoalPrerequisite.objects.select_related('parent', 'child').all()`
+fixes it. But I don't understand why I had the problem in the first
+place:
+
+(0.000) QUERY = 'SELECT "project_metagoalprerequisite"."id",
+        "project_metagoalprerequisite"."parent_key",
+        "project_metagoalprerequisite"."child_key", "project_metagoal"."id",
+        "project_metagoal"."name",
+        "project_metagoal"."project_id", T3."id", T3."name", T3."project_id"
+FROM "project_metagoalprerequisite" INNER JOIN "project_metagoal"
+  ON ("project_metagoalprerequisite"."parent_key" = "project_metagoal"."id")
+INNER JOIN "project_metagoal" T3
+  ON ("project_metagoalprerequisite"."child_key" = T3."id" )' - PARAMS = ();
+args=()
+
+[SQL] 1 queries (0 duplicates), 0 ms SQL time, 84 ms total request time
+[15/Jul/2016 22:22:36] "GET /metagoal_prerequisites/ HTTP/1.1" 200 196

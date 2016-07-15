@@ -15,10 +15,11 @@ class GoalSerializer(serializers.HyperlinkedModelSerializer):
         model = Goal
         fields = ('id', 'url', 'name', 'metagoal', 'metagoal_name')
 
+
 class MetaGoalPrerequisiteSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = MetaGoalPrerequisite
-        fields = ('id', 'url', 'parent', 'child')
+        fields = ('id', 'url')
 
 
 class MetaGoalSerializer(serializers.HyperlinkedModelSerializer):

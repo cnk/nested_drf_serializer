@@ -15,7 +15,8 @@ class MetaGoalViewSet(viewsets.ModelViewSet):
 
 
 class MetaGoalPrerequisiteViewSet(viewsets.ModelViewSet):
-    queryset = MetaGoalPrerequisite.objects.select_related('parent', 'child').all()
+    # queryset = MetaGoalPrerequisite.objects.select_related('parent', 'child').all()
+    queryset = MetaGoalPrerequisite.objects.all()
     serializer_class = MetaGoalPrerequisiteSerializer
 
 
