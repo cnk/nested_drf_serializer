@@ -1,0 +1,79 @@
+[
+{
+    "pk": 1,
+    "fields": {
+        "name": "Project 1"
+    },
+    "model": "project.project"
+},
+{
+    "pk": 2,
+    "fields": {
+        "name": "Project 2"
+    },
+    "model": "project.project"
+},
+{
+    "pk": 3,
+    "fields": {
+        "name": "Testing"
+    },
+    "model": "project.project"
+},
+{
+    "pk": 1,
+    "fields": {
+        "project": 2,
+        "name": "Big Goal 1"
+    },
+    "model": "project.metagoal"
+},
+{
+    "pk": 2,
+    "fields": {
+        "project": 2,
+        "name": "Big Goal 2"
+    },
+    "model": "project.metagoal"
+},
+{
+    "pk": 3,
+    "fields": {
+        "project": 2,
+        "name": "Stretch Goal"
+    },
+    "model": "project.metagoal"
+},
+{
+    "pk": 1,
+    "fields": {
+        "name": "Subgoal 1",
+        "metagoal": 1
+    },
+    "model": "project.goal"
+},
+{
+    "pk": 2,
+    "fields": {
+        "name": "Subgoal 2",
+        "metagoal": 1
+    },
+    "model": "project.goal"
+},
+{
+    "pk": 3,
+    "fields": {
+        "name": "Subgoal 3",
+        "metagoal": 1
+    },
+    "model": "project.goal"
+},
+{
+    "pk": 4,
+    "fields": {
+        "name": "Hard Thing",
+        "metagoal": 3
+    },
+    "model": "project.goal"
+}
+]
